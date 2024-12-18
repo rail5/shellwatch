@@ -8,3 +8,4 @@ shellwatch {SCRIPT-FILE}
 
 Will step the program line-by-line, and display a window containing a list of variable names and the values assigned to them after each line
 
+![shellwatch-screenshot](./shellwatch.png)
