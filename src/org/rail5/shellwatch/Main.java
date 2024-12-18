@@ -85,6 +85,9 @@ class Main {
 		}
 
 		if (parts[1].equals("done")) {
+			// Delete the callback file and exit
+			java.io.File file = new java.io.File(callbackFile);
+			file.delete();
 			System.exit(0);
 		}
 
