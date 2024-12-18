@@ -1,3 +1,9 @@
+shellwatch (0.2) unstable; urgency=medium
+
+  * Added a Java GUI for the hell of it
+
+ -- rail5 <andrew@rail5.org>  Wed, 18 Dec 2024 17:45:02 +0800
+
 shellwatch (0.1) unstable; urgency=low
 
   * Initial release
