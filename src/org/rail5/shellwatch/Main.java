@@ -178,7 +178,7 @@ class Main {
 		// Left panel
 		// The left panel contains the table of variables
 		JPanel leftPanel = new JPanel();
-		leftPanel.setBackground(lighterBackgroundColor);
+		leftPanel.setBackground(backgroundColor);
 		leftPanel.setLayout(null);
 
 		// Table of variables
@@ -200,7 +200,11 @@ class Main {
 		table.getTableHeader().setBackground(buttonBackgroundColor);
 		table.getTableHeader().setForeground(foregroundColor);
 
+		// Set the background color for the empty table
+		table.setFillsViewportHeight(true);
+		table.setOpaque(false);
 		JScrollPane tableScrollPane = new JScrollPane(table);
+		tableScrollPane.getViewport().setBackground(backgroundColor);
 		tableScrollPane.setBorder(BorderFactory.createEmptyBorder());
 		leftPanel.setLayout(new BorderLayout());
 		leftPanel.add(tableScrollPane, BorderLayout.CENTER);
