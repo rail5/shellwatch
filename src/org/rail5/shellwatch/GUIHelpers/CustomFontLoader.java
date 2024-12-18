@@ -14,7 +14,6 @@ public class CustomFontLoader {
 			font = font.deriveFont(size);
 			return font;
 		} catch (FontFormatException | IOException e) {
-			System.out.println("Font not found, using Arial");
 			return new Font("Arial", Font.PLAIN, (int) size);
 		}
 	}

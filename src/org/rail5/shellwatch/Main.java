@@ -154,6 +154,13 @@ class Main {
 
 		topPanel.add(stepButton);
 
+		// Add a label to the right of the button telling us the line number
+		JLabel lineNumberLabel = new JLabel("Line: 0");
+		lineNumberLabel.setFont(defaultFont);
+		lineNumberLabel.setForeground(foregroundColor);
+		lineNumberLabel.setBounds((frameWidth - 100) / 2 + 100, 3, 100, buttonHeight);
+		topPanel.add(lineNumberLabel);
+
 		// Set the size of the top panel to just fit the button
 		topPanel.setPreferredSize(new java.awt.Dimension(frameWidth, buttonHeight + 6));
 
@@ -226,6 +233,9 @@ class Main {
 			vars = loadVars();
 			// Populate the table with the updated variables
 			table.setModel(new javax.swing.table.DefaultTableModel(vars.toTable(), columnNames));
+
+			// Update the line number label
+			lineNumberLabel.setText("Line: " + vars.lineNumber);
 
 			// Clear any existing highlights
 			sourceTextArea.getHighlighter().removeAllHighlights();
