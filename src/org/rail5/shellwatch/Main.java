@@ -161,6 +161,14 @@ class Main {
 		lineNumberLabel.setBounds((frameWidth - 100) / 2 + 100, 3, 100, buttonHeight);
 		topPanel.add(lineNumberLabel);
 
+		// Add a component listener to adjust the label position when the frame is resized
+		frame.addComponentListener(new java.awt.event.ComponentAdapter() {
+			public void componentResized(java.awt.event.ComponentEvent evt) {
+				stepButton.setBounds((frame.getWidth() - 100) / 2, 3, 100, buttonHeight);
+				lineNumberLabel.setBounds((frame.getWidth() - 100) / 2 + 100, 3, 100, buttonHeight);
+			}
+		});
+
 		// Set the size of the top panel to just fit the button
 		topPanel.setPreferredSize(new java.awt.Dimension(frameWidth, buttonHeight + 6));
 
