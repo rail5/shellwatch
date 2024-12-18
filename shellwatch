@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+script_tmp_file="$(mktemp)"
+
+shellwatch_directory="/usr/share/shellwatch"
+shellwatch_showvars_func_file="$shellwatch_directory/shellwatch_show_vars.sh"
+
+if [[ ! -f "$shellwatch_showvars_func_file" ]]; then
+	shellwatch_showvars_func_file="./shellwatch_show_vars.sh"
+fi
+
+function clean_up() {
+	rm -f "$shellwatch_tmp_file"
+	rm -f "$script_tmp_file"
+}
+
+trap clean_up EXIT
+
+script="$1"
+
+if [[ ! -f "$script" ]]; then
+	echo "Usage: $0 <script>"
+	exit 1
+fi
+
+# Read the contents of the given script,
+# Copy those contents to a temporary file,
+# And append the shellwatch_show_vars function:
+# 1. At the very beginning of the script, with initial_run=1
+# 2. After every command in the script, with initial_run=0, latest_line=<line>, context=(are we in a function? If so, which one?)
+
+script_contents="$(cat "$script")"
+context="Main body"
+hit_function=0
+brace_level=0
+
+cat "$shellwatch_showvars_func_file" > "$script_tmp_file"
+echo "" >> "$script_tmp_file"
+echo "shellwatch_show_vars 1" >> "$script_tmp_file"
+echo "shellwatch_show_vars 1" >> "$script_tmp_file"
+
+for line in $(seq 1 $(wc -l <<< "$script_contents")); do
+	line_contents="$(awk -v line="$line" 'NR==line {print $0}' <<< "$script_contents")"
+
+	if [[ -z "$line_contents" ]]; then
+		echo "$line_contents" >> "$script_tmp_file"
+		continue
+	fi
+
+	echo "$line_contents" >> "$script_tmp_file"
+	echo "shellwatch_show_vars 0 $line" >> "$script_tmp_file"
+done
+
+echo "shellwatch_clean_up" >> "$script_tmp_file"
+
+. "$script_tmp_file"
+
+clean_up
