@@ -4,5 +4,6 @@
 
 override_dh_auto_install:
 	install -D -m 0755 shellwatch "$$(pwd)/debian/shellwatch/usr/bin/shellwatch"
+	install -D -m 0755 shellwatch.jar "$$(pwd)/debian/shellwatch/usr/bin/shellwatch.jar"
 	mkdir -p "$$(pwd)/debian/shellwatch/usr/share/shellwatch"
 	install -m 0755 shellwatch_show_vars.sh "$$(pwd)/debian/shellwatch/usr/share/shellwatch/shellwatch_show_vars.sh"

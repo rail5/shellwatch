@@ -9,7 +9,9 @@ if [[ ! -f "$shellwatch_showvars_func_file" ]]; then
 fi
 
 function clean_up() {
+	echo "ping done" > "$shellwatch_callback_file"
 	rm -f "$shellwatch_tmp_file"
+	rm -f "$shellwatch_vars_file"
 	rm -f "$script_tmp_file"
 }
 
@@ -37,6 +39,7 @@ cat "$shellwatch_showvars_func_file" > "$script_tmp_file"
 echo "" >> "$script_tmp_file"
 echo "shellwatch_show_vars 1" >> "$script_tmp_file"
 echo "shellwatch_show_vars 1" >> "$script_tmp_file"
+echo "shellwatch.jar \"\$script\" \"\$shellwatch_vars_file\" \"\$shellwatch_callback_file\" &" >> "$script_tmp_file"
 
 for line in $(seq 1 $(wc -l <<< "$script_contents")); do
 	line_contents="$(awk -v line="$line" 'NR==line {print $0}' <<< "$script_contents")"
