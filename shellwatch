@@ -31,15 +31,14 @@ fi
 # 2. After every command in the script, with initial_run=0, latest_line=<line>, context=(are we in a function? If so, which one?)
 
 script_contents="$(cat "$script")"
-context="Main body"
-hit_function=0
-brace_level=0
 
 cat "$shellwatch_showvars_func_file" > "$script_tmp_file"
 echo "" >> "$script_tmp_file"
 echo "shellwatch_show_vars 1" >> "$script_tmp_file"
 echo "shellwatch_show_vars 1" >> "$script_tmp_file"
 echo "shellwatch.jar \"\$script\" \"\$shellwatch_vars_file\" \"\$shellwatch_callback_file\" &" >> "$script_tmp_file"
+
+inquote=0
 
 for line in $(seq 1 $(wc -l <<< "$script_contents")); do
 	line_contents="$(awk -v line="$line" 'NR==line {print $0}' <<< "$script_contents")"
@@ -50,6 +49,29 @@ for line in $(seq 1 $(wc -l <<< "$script_contents")); do
 	fi
 
 	echo "$line_contents" >> "$script_tmp_file"
+
+	# Check if we're in a multiline quote (ie, the quote starts on this line and ends on a later line)
+	# Count the number of quotes on this line
+	# If the number of quotes is odd, we're in a quote
+	# If the number of quotes is even, we're not in a quote
+
+	quote_count="$(awk -v line="$line" 'NR==line {print gsub(/"/, "&")}' <<< "$script_contents")"
+
+	# quote_count mod 2
+	quote_count=$((quote_count % 2))
+
+	if [[ "$quote_count" -eq 1 ]]; then
+		if [[ "$inquote" -eq 1 ]]; then
+			inquote=0
+		else
+			inquote=1
+		fi
+	fi
+
+	if [[ "$line_contents" == *"\\" ]] || [[ "$inquote" -eq 1 ]]; then
+		continue
+	fi
+
 	echo "shellwatch_show_vars 0 $line" >> "$script_tmp_file"
 done
 
