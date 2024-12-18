@@ -72,6 +72,11 @@ for line in $(seq 1 $(wc -l <<< "$script_contents")); do
 		continue
 	fi
 
+	# If we've just finished a function definition, we don't need to call shellwatch_show_vars
+	if [[ "$line_contents" == "}" ]]; then
+		continue
+	fi
+
 	echo "shellwatch_show_vars 0 $line" >> "$script_tmp_file"
 done
 
