@@ -143,6 +143,14 @@ class Main {
 		// Call 'shellwatch' with the new script file
 		if (callbackFile == null) {
 			callbackFile = "/tmp/shellwatch-callback";
+			// Create the callback file
+			try {
+				java.io.FileWriter fw = new java.io.FileWriter(callbackFile, false);
+				fw.write("");
+				fw.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		}
 
 		String[] cmd = { "shellwatch", scriptFile, "1", callbackFile };
@@ -181,7 +189,7 @@ class Main {
 		// Delete the old callback file
 		java.io.File file = new java.io.File(callbackFile);
 		file.delete();
-		
+
 		varsFile = newVarsFile;
 		callbackFile = newCallbackFile;
 
