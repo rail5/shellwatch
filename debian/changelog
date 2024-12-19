@@ -1,3 +1,12 @@
+shellwatch (0.3) unstable; urgency=medium
+
+  * Trying to flesh out some more features
+    Allow for changing scripts, launching without an initial script, etc
+    Allow for early termination from GUI  Added screenshot
+    Try to skip meaningless break points
+
+ -- rail5 <andrew@rail5.org>  Thu, 19 Dec 2024 12:13:46 +0800
+
 shellwatch (0.2) unstable; urgency=medium
 
   * Added a Java GUI for the hell of it
