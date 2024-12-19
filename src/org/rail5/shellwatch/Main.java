@@ -141,6 +141,10 @@ class Main {
 		}
 
 		// Call 'shellwatch' with the new script file
+		if (callbackFile == null) {
+			callbackFile = "/tmp/shellwatch-callback";
+		}
+
 		String[] cmd = { "shellwatch", scriptFile, "1", callbackFile };
 		try {
 			Runtime.getRuntime().exec(cmd);
@@ -174,6 +178,10 @@ class Main {
 		}
 
 		// Update the vars file and callback file
+		// Delete the old callback file
+		java.io.File file = new java.io.File(callbackFile);
+		file.delete();
+		
 		varsFile = newVarsFile;
 		callbackFile = newCallbackFile;
 
