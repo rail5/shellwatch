@@ -130,7 +130,7 @@ class Main {
 
 	public static void loadScript(String scriptFile) {
 		// Terminate any currently-running script (send "done" to the callback file)
-		if (!initNoArg) {
+		if (callbackFile != null) {
 			try {
 				java.io.FileWriter fw = new java.io.FileWriter(callbackFile, false);
 				fw.write("pong done");
