@@ -58,7 +58,15 @@ class Main {
 
 	static ShellVarList vars;
 
+	static String sourceFileContents = "";
+
+	static boolean initNoArg = false;
+
 	public static ShellVarList loadVars() {
+		if (initNoArg) {
+			initNoArg = false;
+			return new ShellVarList();
+		}
 		// Shellwatch proper will write "ping {linenumber}" to the callback file when ready
 
 		// Open varsFile and read the variables
@@ -105,18 +113,12 @@ class Main {
 		return result;
 	}
 
-	public static void main(String[] args) {
-		if (args.length != 3) {
-			System.out.println("Usage: java -jar shellwatch.jar <source file> <vars file> <callback file>");
-			System.exit(1);
+	public static void loadScriptSource(String scriptFile) {
+		if (scriptFile.equals("")) {
+			return;
 		}
 
-		String sourceFile = args[0];
-		varsFile = args[1];
-		callbackFile = args[2];
-
-		String sourceFileContents = "";
-		try (BufferedReader br = new BufferedReader(new FileReader(sourceFile))) {
+		try (BufferedReader br = new BufferedReader(new FileReader(scriptFile))) {
 			String line;
 			while ((line = br.readLine()) != null) {
 				sourceFileContents += line + "\n";
@@ -124,6 +126,76 @@ class Main {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void loadScript(String scriptFile) {
+		// Terminate any currently-running script (send "done" to the callback file)
+		if (!initNoArg) {
+			try {
+				java.io.FileWriter fw = new java.io.FileWriter(callbackFile, false);
+				fw.write("pong done");
+				fw.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		// Call 'shellwatch' with the new script file
+		String[] cmd = { "shellwatch", scriptFile, "1", callbackFile };
+		try {
+			Runtime.getRuntime().exec(cmd);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		// Load the new script source
+		loadScriptSource(scriptFile);
+
+		// Wait for the new location of the vars file and callback file to be written to the current callback file
+		String newVarsFile = "";
+		String newCallbackFile = "";
+		while (true) {
+			try (BufferedReader br = new BufferedReader(new FileReader(callbackFile))) {
+				String line;
+				// The first line is the path to the new vars file
+				if ((line = br.readLine()) != null) {
+					newVarsFile = line;
+				}
+				// The second line is the path to the new callback file
+				if ((line = br.readLine()) != null) {
+					newCallbackFile = line;
+				}
+				if (!newVarsFile.equals("") && !newCallbackFile.equals("")) {
+					break;
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		// Update the vars file and callback file
+		varsFile = newVarsFile;
+		callbackFile = newCallbackFile;
+
+		// Load the new variables
+		vars = loadVars();
+	}
+
+	public static void main(String[] args) {
+		String sourceFile = "";
+		if (args.length == 0) {
+			initNoArg = true;
+		} else if (args.length == 3) {
+			sourceFile = args[0];
+			varsFile = args[1];
+			callbackFile = args[2];
+		} else {
+			System.out.println("Usage: java -jar shellwatch.jar <source file> <vars file> <callback file>");
+			System.out.println("Or: java -jar shellwatch.jar");
+			System.exit(1);
+		}
+
+		loadScriptSource(sourceFile);
 
 		/* Frame */
 		JFrame frame = new JFrame("Shellwatch");
@@ -134,6 +206,27 @@ class Main {
 		panel.setBackground(backgroundColor);
 
 		/* Components */
+
+		/* Menu bar */
+		JMenuBar menuBar = new JMenuBar();
+		menuBar.setBackground(backgroundColor);
+		menuBar.setForeground(foregroundColor);
+		frame.setJMenuBar(menuBar);
+
+		/* Menu */
+		JMenu fileMenu = new JMenu("File");
+		fileMenu.setFont(defaultFont);
+		fileMenu.setForeground(foregroundColor);
+		fileMenu.setBackground(backgroundColor);
+		menuBar.add(fileMenu);
+
+		/* Menu items */
+		JMenuItem openItem = new JMenuItem("Open Script");
+		openItem.setFont(defaultFont);
+		openItem.setForeground(foregroundColor);
+		openItem.setBackground(backgroundColor);
+		fileMenu.add(openItem);
+
 		// Tiny top panel to hold the 'step' button
 		JPanel topPanel = new JPanel();
 		topPanel.setBackground(backgroundColor);
@@ -269,6 +362,7 @@ class Main {
 				ex.printStackTrace();
 			}
 
+			vars.clear();
 			vars = loadVars();
 			// Populate the table with the updated variables
 			table.setModel(new javax.swing.table.DefaultTableModel(vars.toTable(), columnNames));
@@ -289,6 +383,27 @@ class Main {
 				sourceTextArea.getHighlighter().addHighlight(startOffset, endOffset, new javax.swing.text.DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
 			} catch (BadLocationException ex) {
 				ex.printStackTrace();
+			}
+		});
+
+		// Add action listener to the 'Open Script' menu item
+		openItem.addActionListener(e -> {
+			// Open a file chooser dialog
+			JFileChooser fileChooser = new JFileChooser();
+			int returnValue = fileChooser.showOpenDialog(null);
+			if (returnValue == JFileChooser.APPROVE_OPTION) {
+				java.io.File selectedFile = fileChooser.getSelectedFile();
+				vars.clear();
+				loadScript(selectedFile.getAbsolutePath());
+
+				// Populate the table with the updated variables
+				table.setModel(new javax.swing.table.DefaultTableModel(vars.toTable(), columnNames));
+				
+				// Update the textarea with the new source code
+				sourceTextArea.setText(sourceFileContents);
+
+				// Update the line number label
+				lineNumberLabel.setText("Line: 0");
 			}
 		});
 

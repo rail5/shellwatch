@@ -20,9 +20,12 @@ trap clean_up EXIT
 script="$1"
 
 if [[ ! -f "$script" ]]; then
-	echo "Usage: $0 <script>"
-	exit 1
+	shellwatch.jar
+	exit 0
 fi
+
+GUIalreadyrunning="$2"
+initialcontactfile="$3"
 
 # Read the contents of the given script,
 # Copy those contents to a temporary file,
@@ -36,8 +39,12 @@ cat "$shellwatch_showvars_func_file" > "$script_tmp_file"
 echo "" >> "$script_tmp_file"
 echo "shellwatch_show_vars 1" >> "$script_tmp_file"
 echo "shellwatch_show_vars 1" >> "$script_tmp_file"
-echo "shellwatch.jar \"\$script\" \"\$shellwatch_vars_file\" \"\$shellwatch_callback_file\" &" >> "$script_tmp_file"
 
+if [[ "$GUIalreadyrunning" -ne 1 ]]; then
+	echo "shellwatch.jar \"\$script\" \"\$shellwatch_vars_file\" \"\$shellwatch_callback_file\" &" >> "$script_tmp_file"
+else
+	echo "printf \"\$shellwatch_vars_file\n\$shellwatch_callback_file\n\" > \"$initialcontactfile\"" >> "$script_tmp_file"
+fi
 inquote=0
 
 for line in $(seq 1 $(wc -l <<< "$script_contents")); do
