@@ -161,6 +161,8 @@ class Main {
 			System.exit(0);
 		});
 
+		topPanel.add(terminateButton);
+
 		// 'Step' button
 		JButton stepButton = new JButton("Step");
 		stepButton.setFont(defaultFont);
