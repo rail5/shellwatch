@@ -4,6 +4,10 @@ export shellwatch_tmp_file="$(mktemp)"
 export shellwatch_vars_file="$(mktemp)"
 export shellwatch_callback_file="$(mktemp)"
 
+function shellwatch_clean_up() {
+	rm -f "$shellwatch_tmp_file"
+}
+
 function shellwatch_show_vars() {
 	local initial_run="$1" latest_line="$2"
 	shellwatch_vars="$(set | grep -P -e "^[a-zA-Z0-9_]+=")"
@@ -33,9 +37,12 @@ function shellwatch_show_vars() {
 		while ! grep -q "pong" "$shellwatch_callback_file"; do
 			sleep 1
 		done
+		# If it says "pong", we can carry on
+		# However, if it says "pong done", we should exit early
+		if grep -q "done" "$shellwatch_callback_file"; then
+			shellwatch_clean_up
+			rm -f "$shellwatch_callback_file"
+			exit 0
+		fi
 	fi
-}
-
-function shellwatch_clean_up() {
-	rm -f "$shellwatch_tmp_file"
 }

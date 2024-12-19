@@ -139,6 +139,28 @@ class Main {
 		topPanel.setBackground(backgroundColor);
 		topPanel.setLayout(null);
 
+		// 'Terminate' button
+		JButton terminateButton = new JButton("Terminate");
+		terminateButton.setFont(defaultFont);
+		terminateButton.setBackground(buttonBackgroundColor);
+		terminateButton.setForeground(foregroundColor);
+		terminateButton.setFocusPainted(false);
+		terminateButton.setBorder(new RoundedBorder(10, roundedBorderColor, 2));
+		terminateButton.setBounds(0, 3, 100, buttonHeight); // Initial position
+
+		// Handler for the 'Terminate' button
+		terminateButton.addActionListener(e -> {
+			// Write "done" to the callback file to signal that we're done
+			try {
+				java.io.FileWriter fw = new java.io.FileWriter(callbackFile, false);
+				fw.write("pong done");
+				fw.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+			System.exit(0);
+		});
+
 		// 'Step' button
 		JButton stepButton = new JButton("Step");
 		stepButton.setFont(defaultFont);
