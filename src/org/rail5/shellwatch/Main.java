@@ -114,6 +114,7 @@ class Main {
 	}
 
 	public static void loadScriptSource(String scriptFile) {
+		sourceFileContents = "";
 		if (scriptFile.equals("")) {
 			return;
 		}
