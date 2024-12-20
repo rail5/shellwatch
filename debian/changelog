@@ -1,3 +1,9 @@
+shellwatch (0.4) unstable; urgency=medium
+
+  * Don't pause for comments in scripts
+
+ -- rail5 <andrew@rail5.org>  Fri, 20 Dec 2024 14:04:50 +0800
+
 shellwatch (0.3) unstable; urgency=medium
 
   * Trying to flesh out some more features
