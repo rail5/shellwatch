@@ -79,8 +79,16 @@ for line in $(seq 1 $(wc -l <<< "$script_contents")); do
 		continue
 	fi
 
+	# Trim whitespace from the beginning of the line
+	line_contents="$(sed -e 's/^[[:space:]]*//' <<< "$line_contents")"
+
 	# If we've just finished a function definition, we don't need to call shellwatch_show_vars
 	if [[ "$line_contents" == "}" ]]; then
+		continue
+	fi
+
+	# If the line is just a comment, we don't need to call shellwatch_show_vars
+	if [[ "$line_contents" == "#"* ]]; then
 		continue
 	fi
 
