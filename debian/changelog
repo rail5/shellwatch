@@ -1,3 +1,11 @@
+shellwatch (0.5) unstable; urgency=medium
+
+  * Added runtime dependency on jarwrapper
+  * Added .desktop launcher
+  * Allow for empty shell variables
+
+ -- rail5 <andrew@rail5.org>  Sun, 22 Dec 2024 13:46:13 +0800
+
 shellwatch (0.4) unstable; urgency=medium
 
   * Don't pause for comments in scripts
