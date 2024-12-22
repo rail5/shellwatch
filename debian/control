@@ -11,6 +11,6 @@ License: GPL-3.0
 Vendor: rail5 <andrew@rail5.org>
 Priority: optional
 Architecture: all
-Depends: openjdk-7-jre-headless | openjdk-6-jre-headless | default-jre-headless
+Depends: openjdk-7-jre-headless | openjdk-6-jre-headless | default-jre-headless, jarwrapper
 Description: Step shell scripts and keep watch on variable assignments
  Shellwatch keeps track of variable assignments throughout the execution of a given script
