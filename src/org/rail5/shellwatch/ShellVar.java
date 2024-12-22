@@ -15,10 +15,16 @@ public class ShellVar {
 
 	public static ShellVar fromString(String line) {
 		String[] parts = line.split("=");
-		if (parts.length != 2) {
-			return new ShellVar("", "");
+		switch (parts.length) {
+			case 0:
+				return new ShellVar("", "");
+			case 1:
+				return new ShellVar(parts[0], "");
+			case 2:
+				return new ShellVar(parts[0], parts[1]);
+			default:
+				return new ShellVar(parts[0], parts[1]);
 		}
-		return new ShellVar(parts[0], parts[1]);
 	}
 
 	public static boolean equals(ShellVar a, ShellVar b) {
