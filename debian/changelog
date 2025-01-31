@@ -1,3 +1,11 @@
+shellwatch (0.7) unstable; urgency=medium
+
+  * Added auto-step option
+  * Fixed .desktop file name entry
+  *Fixed build-deps in debian/control
+
+ -- rail5 <andrew@rail5.org>  Fri, 31 Jan 2025 13:49:28 +0800
+
 shellwatch (0.6) unstable; urgency=medium
 
   * Properly display array values
