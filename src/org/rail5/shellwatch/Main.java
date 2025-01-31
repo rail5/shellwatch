@@ -62,6 +62,10 @@ class Main {
 
 	static boolean initNoArg = false;
 
+	static boolean autoStep = false;
+	static double autoStepIncrement = 1.0; // Auto-step increment in seconds
+	static java.util.Timer timer;
+
 	public static ShellVarList loadVars() {
 		if (initNoArg) {
 			initNoArg = false;
@@ -306,6 +310,71 @@ class Main {
 			}
 		});
 
+		// Auto-step checkbox
+		JCheckBox autoStepCheckbox = new JCheckBox("Auto-step");
+		autoStepCheckbox.setFont(defaultFont);
+		autoStepCheckbox.setBackground(backgroundColor);
+		autoStepCheckbox.setForeground(foregroundColor);
+		autoStepCheckbox.setFocusPainted(false);
+		autoStepCheckbox.setBounds(frameWidth - 100, 3, 100, buttonHeight); // Initial position
+
+		// Add a component listener to adjust the checkbox position when the frame is resized
+		frame.addComponentListener(new java.awt.event.ComponentAdapter() {
+			public void componentResized(java.awt.event.ComponentEvent evt) {
+				autoStepCheckbox.setBounds(frame.getWidth() - 100, 3, 100, buttonHeight);
+			}
+		});
+
+		topPanel.add(autoStepCheckbox);
+
+		// Auto-step increment field
+		JTextField autoStepIncrementField = new JTextField();
+		autoStepIncrementField.setFont(defaultFont);
+		autoStepIncrementField.setBackground(textFieldBackgroundColor);
+		autoStepIncrementField.setForeground(textFieldForegroundColor);
+		autoStepIncrementField.setBounds(frameWidth - 200, 3, 100, buttonHeight); // Initial position
+
+		// Set the text field to the default auto-step increment
+		autoStepIncrementField.setText(Double.toString(autoStepIncrement));
+
+		// Add a component listener to adjust the text field position when the frame is resized
+		frame.addComponentListener(new java.awt.event.ComponentAdapter() {
+			public void componentResized(java.awt.event.ComponentEvent evt) {
+				autoStepIncrementField.setBounds(frame.getWidth() - 200, 3, 100, buttonHeight);
+			}
+		});
+
+		topPanel.add(autoStepIncrementField);
+
+		// Add an action listener to the auto-step increment field
+		autoStepIncrementField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+			@Override
+			public void insertUpdate(javax.swing.event.DocumentEvent e) {
+				updateAutoStepIncrement();
+			}
+
+			@Override
+			public void removeUpdate(javax.swing.event.DocumentEvent e) {
+				updateAutoStepIncrement();
+			}
+
+			@Override
+			public void changedUpdate(javax.swing.event.DocumentEvent e) {
+				updateAutoStepIncrement();
+			}
+
+			private void updateAutoStepIncrement() {
+				try {
+					autoStepIncrement = Double.parseDouble(autoStepIncrementField.getText());
+					// Set text field to default color
+					autoStepIncrementField.setBackground(textFieldBackgroundColor);
+				} catch (Exception ex) {
+					// Color the text field red if the input is invalid
+					autoStepIncrementField.setBackground(Color.RED);
+				}
+			}
+		});
+
 		// Set the size of the top panel to just fit the button
 		topPanel.setPreferredSize(new java.awt.Dimension(frameWidth, buttonHeight + 6));
 
@@ -365,6 +434,62 @@ class Main {
 			@Override
 			protected void configureScrollBarColors() {
 				this.thumbColor = lighterBackgroundColor;
+			}
+		});
+
+		// Add an action listener to the auto-step checkbox
+		autoStepCheckbox.addActionListener(e -> {
+			autoStep = autoStepCheckbox.isSelected();
+			// If auto-step is enabled, grey out the 'Step' button and disable the text field
+			stepButton.setEnabled(!autoStep);
+			autoStepIncrementField.setEnabled(!autoStep);
+
+			// If auto-step is enabled, start a timer to automatically step every 'autoStepIncrement' seconds
+			if (autoStep) {
+				// Un-cancel the timer if it was previously cancelled
+				timer = new java.util.Timer();
+				// Set the timer to automatically step every 'autoStepIncrement' seconds
+				timer.scheduleAtFixedRate(new java.util.TimerTask() {
+					@Override
+					public void run() {
+						// Write "pong" to the callback file to signal that we're ready for the next step
+						try {
+							java.io.FileWriter fw = new java.io.FileWriter(callbackFile, false);
+							fw.write("pong");
+							fw.close();
+						} catch (IOException ex) {
+							ex.printStackTrace();
+						}
+
+						vars.clear();
+						vars = loadVars();
+						// Populate the table with the updated variables
+						table.setModel(new javax.swing.table.DefaultTableModel(vars.toTable(), columnNames));
+
+						// Update the line number label
+						lineNumberLabel.setText("Line: " + vars.lineNumber);
+
+						// Clear any existing highlights
+						sourceTextArea.getHighlighter().removeAllHighlights();
+
+						// Highlight the current line in the source code
+						int lineToHighlight = vars.lineNumber;
+						try {
+							int startOffset = sourceTextArea.getLineStartOffset(lineToHighlight - 1);
+							int endOffset = sourceTextArea.getLineEndOffset(lineToHighlight - 1);
+							sourceTextArea.setCaretPosition(startOffset);
+							sourceTextArea.moveCaretPosition(endOffset);
+							sourceTextArea.getHighlighter().addHighlight(startOffset, endOffset, new javax.swing.text.DefaultHighlighter.DefaultHighlightPainter(Color.YELLOW));
+						} catch (BadLocationException ex) {
+							ex.printStackTrace();
+						}
+					}
+				}, 0, (long) (autoStepIncrement * 1000));
+			}
+
+			// If auto-step is disabled, cancel the timer
+			if (!autoStep) {
+				timer.cancel();
 			}
 		});
 
