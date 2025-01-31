@@ -1,7 +1,7 @@
 Source: shellwatch
 Priority: optional
 Maintainer: rail5 <andrew@rail5.org>
-Build-Depends: debhelper (>= 8.0.0), openjdk-7-jdk | openjdk-6-jdk | default-jdk | jdk-21
+Build-Depends: debhelper (>= 8.0.0), openjdk-17-jdk | default-jdk | jdk-21
 Standards-Version: 3.9.3
 Section: utils
 
