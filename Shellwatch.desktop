@@ -11,4 +11,4 @@ Categories=Development;
 Keywords=shellwatch;shell;watch;
 StartupNotify=true
 X-GNOME-UsesNotifications=false
-Name[en_US]=Shellwatch.desktop
+Name[en_US]=Shellwatch
