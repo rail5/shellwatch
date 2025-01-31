@@ -23,7 +23,11 @@ public class ShellVar {
 			case 2:
 				return new ShellVar(parts[0], parts[1]);
 			default:
-				return new ShellVar(parts[0], parts[1]);
+				String value = parts[1];
+				for (int i = 2; i < parts.length; i++) {
+					value += "=" + parts[i];
+				}
+				return new ShellVar(parts[0], value);
 		}
 	}
 

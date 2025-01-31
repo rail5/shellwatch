@@ -13,7 +13,7 @@ function shellwatch_show_vars() {
 	shellwatch_vars="$(set | grep -P -e "^[a-zA-Z0-9_]+=")"
 
 	shellwatch_var_names="$(awk -F= '{print $1}' <<< "$shellwatch_vars")"
-	shellwatch_var_values="$(awk -F= '{print $2}' <<< "$shellwatch_vars")"
+	shellwatch_var_values="$(awk -F= '{for (i=2; i<=NF; i++) printf "%s%s", $i, (i<NF ? "=" : ORS)}' <<< "$shellwatch_vars")"
 
 	if [[ "$initial_run" -eq 1 ]]; then
 		# Sort the initial environment variable names, store them to our temp file
