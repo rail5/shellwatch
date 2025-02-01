@@ -1,3 +1,10 @@
+shellwatch (0.9) unstable; urgency=medium
+
+  * Patched bug which screwed up 'for' loops in scripts
+  * Updated readme with basic information on program usage
+
+ -- rail5 <andrew@rail5.org>  Sat, 01 Feb 2025 12:34:48 +0800
+
 shellwatch (0.8) unstable; urgency=medium
 
   * Allow modifying variable values in the table as we go
