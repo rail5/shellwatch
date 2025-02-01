@@ -1,8 +1,15 @@
+shellwatch (0.8) unstable; urgency=medium
+
+  * Allow modifying variable values in the table as we go
+    Not only viewing but editing memory
+
+ -- rail5 <andrew@rail5.org>  Sat, 01 Feb 2025 12:19:44 +0800
+
 shellwatch (0.7) unstable; urgency=medium
 
   * Added auto-step option
   * Fixed .desktop file name entry
-  *Fixed build-deps in debian/control
+  * Fixed build-deps in debian/control
 
  -- rail5 <andrew@rail5.org>  Fri, 31 Jan 2025 13:49:28 +0800
 
