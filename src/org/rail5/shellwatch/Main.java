@@ -55,6 +55,7 @@ class Main {
 
 	static String varsFile;
 	static String callbackFile;
+	static String updatedVarsFile;
 
 	static ShellVarList vars;
 
@@ -101,6 +102,15 @@ class Main {
 			java.io.File file = new java.io.File(callbackFile);
 			file.delete();
 			System.exit(0);
+		}
+
+		// Clear the updated vars file
+		try {
+			java.io.FileWriter fw = new java.io.FileWriter(updatedVarsFile, false);
+			fw.write("");
+			fw.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
 		}
 
 		result.lineNumber = Integer.parseInt(parts[1]);
@@ -171,6 +181,7 @@ class Main {
 		// Wait for the new location of the vars file and callback file to be written to the current callback file
 		String newVarsFile = "";
 		String newCallbackFile = "";
+		String newUpdatedVarsFile = "";
 		while (true) {
 			try (BufferedReader br = new BufferedReader(new FileReader(callbackFile))) {
 				String line;
@@ -182,7 +193,11 @@ class Main {
 				if ((line = br.readLine()) != null) {
 					newCallbackFile = line;
 				}
-				if (!newVarsFile.equals("") && !newCallbackFile.equals("")) {
+				// The third line is the path to the new updated vars file
+				if ((line = br.readLine()) != null) {
+					newUpdatedVarsFile = line;
+				}
+				if (!newVarsFile.equals("") && !newCallbackFile.equals("") && !newUpdatedVarsFile.equals("")) {
 					break;
 				}
 			} catch (IOException e) {
@@ -197,6 +212,7 @@ class Main {
 
 		varsFile = newVarsFile;
 		callbackFile = newCallbackFile;
+		updatedVarsFile = newUpdatedVarsFile;
 
 		// Load the new variables
 		vars = loadVars();
@@ -206,12 +222,13 @@ class Main {
 		String sourceFile = "";
 		if (args.length == 0) {
 			initNoArg = true;
-		} else if (args.length == 3) {
+		} else if (args.length == 4) {
 			sourceFile = args[0];
 			varsFile = args[1];
 			callbackFile = args[2];
+			updatedVarsFile = args[3];
 		} else {
-			System.out.println("Usage: java -jar shellwatch.jar <source file> <vars file> <callback file>");
+			System.out.println("Usage: java -jar shellwatch.jar <source file> <vars file> <callback file> <updated vars file>");
 			System.out.println("Or: java -jar shellwatch.jar");
 			System.exit(1);
 		}
@@ -391,8 +408,27 @@ class Main {
 		JTable table = new JTable(vars.toTable(), columnNames) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				return false; // Make the table read-only
+				// Make the 'Value' column editable and the 'Variable' column read-only
+				return column == 1;
 			}
+
+			// Listener to update the variable value when it is edited
+			@Override
+			public void setValueAt(Object value, int row, int col) {
+				String variableName = vars.get(row).name;
+				String variableValue = value.toString();
+				// Write the updated variable to the updated vars file
+				try {
+					java.io.FileWriter fw = new java.io.FileWriter(updatedVarsFile, true);
+					fw.write("export " + variableName + "='" + variableValue + "'\n");
+					fw.close();
+					// Set the variable value in the table
+					super.setValueAt(variableValue, row, col);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+				}
+			}
+
 		};
 
 		table.setFont(defaultFont);

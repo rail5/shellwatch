@@ -12,6 +12,7 @@ function clean_up() {
 	echo "ping done" > "$shellwatch_callback_file"
 	rm -f "$shellwatch_tmp_file"
 	rm -f "$shellwatch_vars_file"
+	rm -f "$shellwatch_newvars_file"
 	rm -f "$script_tmp_file"
 }
 
@@ -41,9 +42,9 @@ echo "shellwatch_show_vars 1" >> "$script_tmp_file"
 echo "shellwatch_show_vars 1" >> "$script_tmp_file"
 
 if [[ "$GUIalreadyrunning" -ne 1 ]]; then
-	echo "shellwatch.jar \"\$script\" \"\$shellwatch_vars_file\" \"\$shellwatch_callback_file\" &" >> "$script_tmp_file"
+	echo "shellwatch.jar \"\$script\" \"\$shellwatch_vars_file\" \"\$shellwatch_callback_file\" \"\$shellwatch_newvars_file\" &" >> "$script_tmp_file"
 else
-	echo "printf \"\$shellwatch_vars_file\n\$shellwatch_callback_file\n\" > \"$initialcontactfile\"" >> "$script_tmp_file"
+	echo "printf \"\$shellwatch_vars_file\n\$shellwatch_callback_file\n\$shellwatch_newvars_file\n\" > \"$initialcontactfile\"" >> "$script_tmp_file"
 fi
 inquote=0
 

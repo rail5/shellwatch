@@ -3,6 +3,7 @@
 export shellwatch_tmp_file="$(mktemp)"
 export shellwatch_vars_file="$(mktemp)"
 export shellwatch_callback_file="$(mktemp)"
+export shellwatch_newvars_file="$(mktemp)"
 
 function shellwatch_clean_up() {
 	rm -f "$shellwatch_tmp_file"
@@ -35,7 +36,7 @@ function shellwatch_show_vars() {
 		unset i shellwatch_var_name shellwatch_var_value shellwatch_vars shellwatch_var_names shellwatch_var_values
 		# Watch the callback file until it says "pong"
 		while ! grep -q "pong" "$shellwatch_callback_file"; do
-			sleep 1
+			sleep 0.1
 		done
 		# If it says "pong", we can carry on
 		# However, if it says "pong done", we should exit early
@@ -44,5 +45,8 @@ function shellwatch_show_vars() {
 			rm -f "$shellwatch_callback_file"
 			exit 0
 		fi
+
+		# Source the new variables
+		source "$shellwatch_newvars_file"
 	fi
 }
