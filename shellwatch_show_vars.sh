@@ -22,18 +22,18 @@ function shellwatch_show_vars() {
 		awk -F= '{print $1}' <<< "$shellwatch_vars" > "$shellwatch_tmp_file"
 		echo "ping 1" > "$shellwatch_callback_file"
 	else
-		( for i in $(seq 1 $(wc -l <<< "$shellwatch_var_names")); do
-			shellwatch_var_name="$(awk -v i="$i" 'NR==i {print $1}' <<< "$shellwatch_var_names")"
+		( for shellwatchvar in $(seq 1 $(wc -l <<< "$shellwatch_var_names")); do
+			shellwatch_var_name="$(awk -v i="$shellwatchvar" 'NR==i {print $1}' <<< "$shellwatch_var_names")"
 
 			if grep -q "^$shellwatch_var_name$" "$shellwatch_tmp_file"; then
 				continue
 			fi
 
-			shellwatch_var_value="$(awk -v i="$i" 'NR==i' <<< "$shellwatch_var_values")"
+			shellwatch_var_value="$(awk -v i="$shellwatchvar" 'NR==i' <<< "$shellwatch_var_values")"
 			echo "$shellwatch_var_name=$shellwatch_var_value"
 		done ) > "$shellwatch_vars_file"
 		echo "ping $latest_line" > "$shellwatch_callback_file"
-		unset i shellwatch_var_name shellwatch_var_value shellwatch_vars shellwatch_var_names shellwatch_var_values
+		unset shellwatchvar shellwatch_var_name shellwatch_var_value shellwatch_vars shellwatch_var_names shellwatch_var_values
 		# Watch the callback file until it says "pong"
 		while ! grep -q "pong" "$shellwatch_callback_file"; do
 			sleep 0.1
