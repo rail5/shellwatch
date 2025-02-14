@@ -1,3 +1,10 @@
+shellwatch (0.10) unstable; urgency=medium
+
+  * Allow faster auto-steps. Uses a bit more CPU though.
+    Maybe this should be configurable?
+
+ -- rail5 <andrew@rail5.org>  Sat, 15 Feb 2025 00:28:45 +0800
+
 shellwatch (0.9) unstable; urgency=medium
 
   * Patched bug which screwed up 'for' loops in scripts
