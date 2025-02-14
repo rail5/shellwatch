@@ -1,3 +1,9 @@
+shellwatch (0.11) unstable; urgency=medium
+
+  * Reverted previous change
+
+ -- rail5 <andrew@rail5.org>  Sat, 15 Feb 2025 00:33:02 +0800
+
 shellwatch (0.10) unstable; urgency=medium
 
   * Allow faster auto-steps. Uses a bit more CPU though.
