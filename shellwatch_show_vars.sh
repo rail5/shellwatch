@@ -36,7 +36,7 @@ function shellwatch_show_vars() {
 		unset shellwatchvar shellwatch_var_name shellwatch_var_value shellwatch_vars shellwatch_var_names shellwatch_var_values
 		# Watch the callback file until it says "pong"
 		while ! grep -q "pong" "$shellwatch_callback_file"; do
-			sleep 0.1
+			sleep 0.01
 		done
 		# If it says "pong", we can carry on
 		# However, if it says "pong done", we should exit early
