@@ -15,9 +15,8 @@
 
 #include <cstdint>
 #include <expected>
-#include <filesystem>
 
-using Milliseconds = std::uint64_t;
+#include "State.h"
 
 class MainWindow : public wxFrame {
 	public:
@@ -29,13 +28,18 @@ class MainWindow : public wxFrame {
 		MainWindow(MainWindow&&) = delete;
 		MainWindow& operator=(MainWindow&&) = delete;
 
+		friend class WindowAndStatePair;
 	private:
-		std::filesystem::path script;
+		State state;
 
-		std::uint32_t currentLineNumber = 0;
-
-		Milliseconds autostepInterval = 100;
-		bool autostepEnabled = false;
+		/**
+		 * @brief Highlight a specific line in the source code display based on the provided line number. The line number is 1-based.
+		 *
+		 * If called as highlightSourceCodeLine(0), it will clear any existing highlights without highlighting any line.
+		 *
+		 * @param lineNumber The line number to highlight in the source code display (1-based).
+		 */
+		void highlightSourceCodeLine(std::uint32_t lineNumber);
 
 		/**
 		 * @brief Parse a string representing an autostep interval in seconds (e.g., '0.1') and convert it to milliseconds (e.g., 100).
@@ -53,29 +57,6 @@ class MainWindow : public wxFrame {
 		 */
 		static std::string displayAsSeconds(Milliseconds ms);
 
-		/**
-		 * @brief Highlight a specific line in the source code display based on the provided line number. The line number is 1-based.
-		 *
-		 * If called as highlightSourceCodeLine(0), it will clear any existing highlights without highlighting any line.
-		 * 
-		 * @param lineNumber The line number to highlight in the source code display (1-based).
-		 */
-		void highlightSourceCodeLine(std::uint32_t lineNumber);
-
-		/**
-		 * @brief Update both the currentLineNumber internal value and the displayed line number in the GUI.
-		 * 
-		 * @param lineNumber The new line number to set and display.
-		 */
-		void updateLineNumber(std::uint32_t lineNumber);
-
-		/**
-		 * @brief Update the internal script file path, set the line number to 0, and update the displayed source code to the contents of the new script file.
-		 * 
-		 * @param filePath The path to the new script file to be set.
-		 */
-		void setScriptFile(const std::filesystem::path& filePath);
-
 		void OnOpen(wxCommandEvent& event);
 		void OnAutostepTextChanged(wxCommandEvent& event);
 		void OnStep(wxCommandEvent& event);
@@ -90,6 +71,7 @@ class MainWindow : public wxFrame {
 		const wxWindowID ID_RICHTEXTCTRL1 = wxNewId();
 		const wxWindowID ID_LISTCTRL1     = wxNewId();
 		const wxWindowID ID_RICHTEXTCTRL2 = wxNewId();
+		const wxWindowID ID_MENU_QUIT     = wxNewId();
 
 		wxMenuBar* menuBar;
 		wxMenu* fileMenu;
