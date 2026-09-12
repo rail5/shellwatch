@@ -12,8 +12,6 @@ Will step the program line-by-line, and display a window containing a list of va
 
 Pressing the <kbd>Step</kbd> button will execute the next line of the script. Each step will update the variable list.
 
-Checking the <kbd>Auto-step</kbd> checkbox will automatically step through the script, updating the variable list after each line. You can adjust the speed of the auto-step by modifying the `delay` input. By default, the delay is set to `1.0` second.
+Checking the <kbd>Auto-step</kbd> checkbox will automatically step through the script, updating the variable list after each line. You can adjust the speed of the auto-step by modifying the `delay` input. By default, the delay is set to `0.1` seconds.
 
-You can modify the values of the variables in the list by clicking on the value in the table and typing in a new value. Pressing <kbd>Enter</kbd> will update the variable with the new value. This new value will be passed to the script when the next line is executed.
-
-Pressing the <kbd>Terminate</kbd> button will stop the script and close the window.
+Pressing the <kbd>Terminate</kbd> button will stop the script and clear the variable list.
