@@ -24,4 +24,4 @@ clean:
 
 .PHONY: clean
 
--include $(OBJS:.o=.d)
+-include $(OBJECTS:.o=.d)
