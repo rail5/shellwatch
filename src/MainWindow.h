@@ -14,6 +14,9 @@
 #include <wx/stattext.h>
 
 #include <cstdint>
+#include <expected>
+
+using Milliseconds = std::uint64_t;
 
 class MainWindow : public wxFrame {
 	public:
@@ -26,7 +29,29 @@ class MainWindow : public wxFrame {
 		MainWindow& operator=(MainWindow&&) = delete;
 
 	private:
+		std::uint32_t currentLineNumber = 0;
+
+		Milliseconds autostepInterval = 100;
+		bool autostepEnabled = false;
+
+		/**
+		 * @brief Parse a string representing an autostep interval in seconds (e.g., '0.1') and convert it to milliseconds (e.g., 100).
+		 *
+		 * @param text The input string representing the autostep interval in seconds.
+		 * @return std::expected<Milliseconds, bool> The parsed autostep interval in milliseconds, or false if the input is invalid.
+		 */
+		static std::expected<Milliseconds, bool> parseAutostepInterval(const wxString& text);
+
+		/**
+		 * @brief Display a given interval in milliseconds as a string in seconds with up to 3 decimal places (e.g., 100 -> "0.1").
+		 *
+		 * @param ms The interval in milliseconds to be converted to seconds.
+		 * @return std::string The formatted string representing the interval in seconds.
+		 */
+		static std::string displayAsSeconds(Milliseconds ms);
+
 		void highlightSourceCodeLine(std::uint32_t lineNumber);
+		void OnAutostepTextChanged(wxCommandEvent& event);
 
 		void OnQuit(wxCommandEvent& /*event*/);
 		void OnAbout(wxCommandEvent& /*event*/);

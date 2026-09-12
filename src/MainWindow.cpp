@@ -8,6 +8,7 @@
 #include <wx/msgdlg.h>
 #include <wx/intl.h>
 #include <wx/menu.h>
+#include <wx/settings.h>
 #include <wx/string.h>
 
 // Unfortunately, wxWidgets relies on raw 'new' and 'delete'.
@@ -58,6 +59,7 @@ MainWindow::MainWindow(wxWindow* parent,wxWindowID id) {
 	AutostepCheckbox = new wxCheckBox(this, ID_CHECKBOX1, _("Auto-step"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	AutostepCheckbox->SetValue(false);
 	AutostepTextCtrl = new wxTextCtrl(this, ID_RICHTEXTCTRL1, _T("0.1"), wxDefaultPosition, wxSize(85,32), 0, wxDefaultValidator, _T("ID_RICHTEXTCTRL1"));
+	AutostepTextCtrl->Bind(wxEVT_TEXT, &MainWindow::OnAutostepTextChanged, this);
 	AutostepContainer->Add(AutostepCheckbox, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 1);
 	AutostepContainer->Add(AutostepTextCtrl, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 1);
 
@@ -89,6 +91,51 @@ MainWindow::MainWindow(wxWindow* parent,wxWindowID id) {
 
 MainWindow::~MainWindow() {}
 
+std::expected<Milliseconds, bool> MainWindow::parseAutostepInterval(const wxString& text) {
+	std::uint64_t seconds = 0;
+	std::uint64_t milliseconds = 0;
+	std::uint64_t decimalPosition = 3; // Max 3 decimal places (0.001 = decimal position 1, 0.01 = decimal position 2, 0.1 = decimal position 3)
+
+	bool decimalPointEncountered = false;
+
+	for (const char c : text) {
+		switch (c) {
+			case '0' ... '9':
+				if (!decimalPointEncountered) {
+					seconds *= 10;
+					seconds += static_cast<std::uint64_t>(c - '0');
+				} else {
+					if (decimalPosition == 0) break; // Ignore digits beyond 3 decimal places
+					milliseconds += static_cast<std::uint64_t>(c - '0') * static_cast<std::uint64_t>(std::pow(10, decimalPosition - 1));
+					decimalPosition = (decimalPosition > 0) ? decimalPosition - 1 : 0;
+				}
+				break;
+			case '.':
+				if (decimalPointEncountered) {
+					return std::unexpected(false); // Invalid input: multiple decimal points
+				}
+				decimalPointEncountered = true;
+				break;
+			default:
+				return std::unexpected(false); // Invalid input: non-numeric character
+		}
+	}
+
+	return {(seconds * 1000) + milliseconds};
+}
+
+std::string MainWindow::displayAsSeconds(Milliseconds ms) {
+	std::uint64_t seconds = ms / 1000;
+	std::uint64_t milliseconds = ms % 1000;
+
+	std::string result = std::to_string(seconds) + '.';
+	if (milliseconds < 10) result += '0';
+	if (milliseconds < 100) result += '0';
+	result += std::to_string(milliseconds);
+
+	return result;
+}
+
 void MainWindow::highlightSourceCodeLine(std::uint32_t lineNumber) {
 	// Clear any existing highlights
 	SourceCodeDisplay->SetStyle(wxRichTextRange(0, SourceCodeDisplay->GetLastPosition()), wxTextAttr(wxNullColour, wxNullColour));
@@ -101,6 +148,19 @@ void MainWindow::highlightSourceCodeLine(std::uint32_t lineNumber) {
 	// Highlight the specified line
 	SourceCodeDisplay->SetStyle(lineRange, wxTextAttr(wxColour(0, 0, 0), wxColour(255, 255, 0))); // Yellow background, black text
 	SourceCodeDisplay->ShowPosition(lineStartPos); // Ensure the highlighted line is visible
+}
+
+void MainWindow::OnAutostepTextChanged(wxCommandEvent& event) {
+	const std::expected<Milliseconds, bool> parsedInterval = parseAutostepInterval(event.GetString());
+	if (parsedInterval) {
+		autostepInterval = *parsedInterval;
+		AutostepTextCtrl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW)); // Reset to default background color
+		AutostepTextCtrl->Refresh(); // Refresh to apply the color change
+	} else {
+		// Highlight the text box in red to indicate an error
+		AutostepTextCtrl->SetBackgroundColour(wxColour(255, 0, 0)); // Red background
+		AutostepTextCtrl->Refresh(); // Refresh to apply the color change
+	}
 }
 
 void MainWindow::OnQuit(wxCommandEvent& /*event*/) {
