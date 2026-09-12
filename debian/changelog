@@ -1,3 +1,17 @@
+shellwatch (0.12) unstable; urgency=medium
+
+  * Complete rewrite. Changes listed below:
+  * Use C++23/wxWidgets instead of Java
+  * Use proper unix sockets instead of filesystem communication
+    This makes IPC between the GUI/shell script orders of magnitude faster
+    than the old hacky implementation
+  * Trap on DEBUG instead of adding a hook after every line
+    This is infinitely more robust; the old method failed on multi-line
+    shell commands, and took longer since we had to modify the script before
+    executing it. Now we just source our helper and go.
+
+ -- rail5 <andrew@rail5.org>  Sun, 13 Sep 2026 01:43:31 +0800
+
 shellwatch (0.11) unstable; urgency=medium
 
   * Reverted previous change
