@@ -13,6 +13,8 @@
 #include <wx/settings.h>
 #include <wx/string.h>
 
+#include <utility>
+
 // Unfortunately, wxWidgets relies on raw 'new' and 'delete'.
 // NOLINTBEGIN(cppcoreguidelines-owning-memory)
 // NOLINTBEGIN(cppcoreguidelines-prefer-member-initializer)
@@ -47,6 +49,7 @@ MainWindow::MainWindow(wxWindow* parent,wxWindowID id) {
 	TopSizer = new wxBoxSizer(wxHORIZONTAL);
 
 	QuitButton = new wxButton(this, ID_BUTTON1, _("Terminate"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	QuitButton->Bind(wxEVT_BUTTON, &MainWindow::OnTerminate, this);
 
 	TopSizer->Add(QuitButton, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 
@@ -141,10 +144,14 @@ std::string MainWindow::displayAsSeconds(Milliseconds ms) {
 }
 
 void MainWindow::highlightSourceCodeLine(std::uint32_t lineNumber) {
-	// Clear any existing highlights
-	SourceCodeDisplay->SetStyle(wxRichTextRange(0, SourceCodeDisplay->GetLastPosition()), wxTextAttr(wxNullColour, wxNullColour));
+	// Reset all text to the control's normal colors before highlighting a new line.
+	const wxColour normalTextColor = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWTEXT);
+	const wxColour normalBackgroundColor = wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW);
+	const auto lastPos = SourceCodeDisplay->GetLastPosition();
+	SourceCodeDisplay->SetStyle(wxRichTextRange(0, lastPos + 1), wxTextAttr(normalTextColor, normalBackgroundColor));
 
 	if (lineNumber == 0) return; // No line to highlight
+	if (std::cmp_greater(lineNumber ,SourceCodeDisplay->GetNumberOfLines())) return;
 
 	// Calculate the start and end positions of the specified line
 	auto lineStartPos = SourceCodeDisplay->XYToPosition(0, lineNumber - 1);
@@ -154,6 +161,14 @@ void MainWindow::highlightSourceCodeLine(std::uint32_t lineNumber) {
 	// Highlight the specified line
 	SourceCodeDisplay->SetStyle(lineRange, wxTextAttr(wxColour(0, 0, 0), wxColour(255, 255, 0))); // Yellow background, black text
 	SourceCodeDisplay->ShowPosition(lineStartPos); // Ensure the highlighted line is visible
+}
+
+void MainWindow::setDisplayedVariables(const std::unordered_map<std::string, std::string>& variables) {
+	ShellVariableListCtrl->DeleteAllItems();
+	for (const auto& [varName, varValue] : variables) {
+		std::int64_t index = ShellVariableListCtrl->InsertItem(ShellVariableListCtrl->GetItemCount(), varName);
+		ShellVariableListCtrl->SetItem(index, 1, varValue);
+	}
 }
 
 void MainWindow::OnAutostepTextChanged(wxCommandEvent& event) {
@@ -177,7 +192,11 @@ void MainWindow::OnOpen(wxCommandEvent& /*event*/) {
 }
 
 void MainWindow::OnStep(wxCommandEvent& /*event*/) {
-	// fixme
+	(*this|state).stepScript();
+}
+
+void MainWindow::OnTerminate(wxCommandEvent& /*event*/) {
+	(*this|state).killScript();
 }
 
 void MainWindow::OnQuit(wxCommandEvent& /*event*/) { // NOLINT(readability-convert-member-functions-to-static) (wxWidgets requires this to be a member function)

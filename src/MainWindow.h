@@ -41,6 +41,8 @@ class MainWindow : public wxFrame {
 		 */
 		void highlightSourceCodeLine(std::uint32_t lineNumber);
 
+		void setDisplayedVariables(const std::unordered_map<std::string, std::string>& variables);
+
 		/**
 		 * @brief Parse a string representing an autostep interval in seconds (e.g., '0.1') and convert it to milliseconds (e.g., 100).
 		 *
@@ -60,6 +62,7 @@ class MainWindow : public wxFrame {
 		void OnOpen(wxCommandEvent& event);
 		void OnAutostepTextChanged(wxCommandEvent& event);
 		void OnStep(wxCommandEvent& event);
+		void OnTerminate(wxCommandEvent& event);
 
 		void OnQuit(wxCommandEvent& /*event*/);
 		void OnAbout(wxCommandEvent& /*event*/);

@@ -7,6 +7,10 @@
 
 #include <filesystem>
 #include <cstdint>
+#include <unordered_map>
+
+#include "Socket.h"
+#include "run_bash.h"
 
 using Milliseconds = std::uint64_t;
 
@@ -14,10 +18,24 @@ class MainWindow;
 
 class State {
 	private:
+		Socket socket;
 		std::filesystem::path script;
+		std::uint32_t pendingTrapLineNumber = 0;
 		std::uint32_t currentLineNumber = 0;
+		std::unordered_map<std::string, std::string> variables;
 		Milliseconds autostepInterval = 100;
 		bool autostepEnabled = false;
+		bool executing = false;
+		bool executionFinished = false;
+
+		void beginExecution() {
+			if (executing) return;
+			socket = Socket{};
+			run_bash(script.string(), socket.getShellToGuiWriteFd(), socket.getGuiToShellReadFd());
+			socket.closeChildEndsInParent();
+			executing = true;
+			executionFinished = false;
+		}
 	public:
 		friend class WindowAndStatePair;
 		const std::filesystem::path& getScriptFile() const { return script; }
@@ -55,6 +73,10 @@ class WindowAndStatePair {
 		 * @param filePath The path to the new script file to be set.
 		 */
 		void setScriptFile(const std::filesystem::path& filePath);
+
+		void stepScript();
+
+		void killScript();
 };
 
 WindowAndStatePair operator|(MainWindow& window, State& state);
