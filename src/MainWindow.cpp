@@ -251,7 +251,20 @@ void MainWindow::OnQuit(wxCommandEvent& /*event*/) { // NOLINT(readability-conve
 }
 
 void MainWindow::OnAbout(wxCommandEvent& /*event*/) { // NOLINT(readability-convert-member-functions-to-static) (wxWidgets requires this to be a member function)
-	wxMessageBox(_("About window"), _("About"));
+	wxMessageBox(_(
+		"Shellwatch is a utility to display the state of variables throughout the execution of a shell script.\n"
+		"\n"
+		"Copyright (C) 2026 Andrew S. Rightenburg\n"
+		"This program is free software: you can redistribute it and/or modify\n"
+		"it under the terms of the GNU General Public License as published by\n"
+		"the Free Software Foundation, either version 3 of the License, or\n"
+		"(at your option) any later version.\n"
+		"\n"
+		"This program is distributed in the hope that it will be useful,\n"
+		"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+		"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+		"GNU General Public License for more details.\n"
+	), _("About"));
 }
 
 // NOLINTEND(cppcoreguidelines-prefer-member-initializer)
