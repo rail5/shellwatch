@@ -16,7 +16,7 @@
 
 inline void run_bash(const std::string& filename, int shellToGuiFd, int guiToShellFd) {
 	std::vector<std::string> exec_args;
-	exec_args.reserve(6);
+	exec_args.reserve(7);
 	exec_args.emplace_back("bash");
 	exec_args.emplace_back("-c");
 	exec_args.emplace_back(R"(export SHELLWATCH_SOCKET_TO_GUI="$1"; export SHELLWATCH_SOCKET_FROM_GUI="$2"; source /usr/share/shellwatch/helper.sh; source "$3")");
