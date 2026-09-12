@@ -86,6 +86,7 @@ MainWindow::MainWindow(wxWindow* parent, int argc, const wxCmdLineArgsArray& arg
 	SourceCodeDisplay = new wxRichTextCtrl(this, ID_RICHTEXTCTRL2, _("Line 1\nLine 2\nLine 3\n"), wxDefaultPosition, wxDefaultSize, wxRE_MULTILINE, wxDefaultValidator, _T("ID_RICHTEXTCTRL2"));
 	wxRichTextAttr rchtxtAttr_2;
 	rchtxtAttr_2.SetBulletStyle(wxTEXT_ATTR_BULLET_STYLE_ALIGN_LEFT);
+	SourceCodeDisplay->SetEditable(false);
 
 	SourceCodeDisplay->SetMinSize(wxSize(250,350));
 
