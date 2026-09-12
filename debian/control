@@ -1,16 +1,16 @@
 Source: shellwatch
+Homepage: https://github.com/rail5/shellwatch
 Priority: optional
 Maintainer: rail5 <andrew@rail5.org>
-Build-Depends: debhelper (>= 8.0.0), openjdk-17-jdk | default-jdk | jdk-21
-Standards-Version: 3.9.3
+Build-Depends: debhelper (>= 8.0.0), wx3.2-headers, libwxgtk3.2-dev
+Standards-Version: 4.7.0
 Section: utils
 
 Package: shellwatch
 Version: 1.0
 License: GPL-3.0
-Vendor: rail5 <andrew@rail5.org>
-Priority: optional
-Architecture: all
-Depends: openjdk-7-jre-headless | openjdk-6-jre-headless | default-jre-headless, jarwrapper
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Step shell scripts and keep watch on variable assignments
- Shellwatch keeps track of variable assignments throughout the execution of a given script
+ Shellwatch keeps track of variable assignments throughout the execution of a
+ given script
