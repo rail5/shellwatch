@@ -15,11 +15,11 @@
 #include <stdexcept>
 #include <system_error>
 #include <string_view>
-#include <unordered_map>
+#include <map>
 
 struct DebugInfo {
 	std::size_t lineNumber = 0;
-	std::unordered_map<std::string, std::string> variables;
+	std::map<std::string, std::string> variables;
 };
 
 class Socket {

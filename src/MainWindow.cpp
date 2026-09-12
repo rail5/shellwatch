@@ -170,7 +170,7 @@ void MainWindow::highlightSourceCodeLine(std::uint32_t lineNumber) {
 	SourceCodeDisplay->ShowPosition(lineStartPos); // Ensure the highlighted line is visible
 }
 
-void MainWindow::setDisplayedVariables(const std::unordered_map<std::string, std::string>& variables) {
+void MainWindow::setDisplayedVariables(const std::map<std::string, std::string>& variables) {
 	ShellVariableListCtrl->DeleteAllItems();
 	for (const auto& [varName, varValue] : variables) {
 		std::int64_t index = ShellVariableListCtrl->InsertItem(ShellVariableListCtrl->GetItemCount(), varName);

@@ -7,7 +7,7 @@
 
 #include <filesystem>
 #include <cstdint>
-#include <unordered_map>
+#include <map>
 
 #include "Socket.h"
 #include "run_bash.h"
@@ -22,7 +22,7 @@ class State {
 		std::filesystem::path script;
 		std::uint32_t pendingTrapLineNumber = 0;
 		std::uint32_t currentLineNumber = 0;
-		std::unordered_map<std::string, std::string> variables;
+		std::map<std::string, std::string> variables;
 		Milliseconds autostepInterval = 100;
 		bool autostepEnabled = false;
 		bool executing = false;
