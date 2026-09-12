@@ -164,7 +164,10 @@ void MainWindow::OnAutostepTextChanged(wxCommandEvent& event) {
 }
 
 void MainWindow::OnQuit(wxCommandEvent& /*event*/) {
-	Close();
+	if (auto* app = dynamic_cast<wxApp*>(wxApp::GetInstance())) {
+		app->SetTopWindow(nullptr);
+	}
+	Destroy();
 }
 
 void MainWindow::OnAbout(wxCommandEvent& /*event*/) { // NOLINT(readability-convert-member-functions-to-static) (wxWidgets requires this to be a member function)
