@@ -24,8 +24,8 @@ class MainWindow : public wxFrame {
 		MainWindow& operator=(MainWindow&&) = delete;
 
 	private:
-		void OnQuit(wxCommandEvent& event);
-		void OnAbout(wxCommandEvent& event);
+		void OnQuit(wxCommandEvent& /*event*/);
+		void OnAbout(wxCommandEvent& /*event*/);
 
 		const wxWindowID ID_BUTTON1       = wxNewId();
 		const wxWindowID ID_STATICTEXT1   = wxNewId();
@@ -35,18 +35,21 @@ class MainWindow : public wxFrame {
 		const wxWindowID ID_LISTCTRL1     = wxNewId();
 		const wxWindowID ID_RICHTEXTCTRL2 = wxNewId();
 
+		wxMenuBar* menuBar;
+		wxMenu* fileMenu;
+		wxMenu* helpMenu;
 		wxButton* QuitButton;
 		wxButton* StepButton;
 		wxCheckBox* AutostepCheckbox;
 		wxListCtrl* ShellVariableListCtrl;
-		wxRichTextCtrl* AutostepTextCtrl;
+		wxTextCtrl* AutostepTextCtrl;
 		wxRichTextCtrl* SourceCodeDisplay;
-		wxStaticText* StaticText1;
+		wxStaticText* LineNumberLabel;
 		wxBoxSizer* BottomSizer;
-		wxBoxSizer* BoxSizer2;
-		wxBoxSizer* BoxSizer3;
+		wxBoxSizer* StepButtonContainer;
+		wxBoxSizer* AutostepContainer;
 		wxBoxSizer* TopSizer;
-		wxFlexGridSizer* FlexGridSizer1;
+		wxFlexGridSizer* MainWindowContainer;
 
 		DECLARE_EVENT_TABLE() // NOLINT (no point linting the expansion of a macro we can't control)
 };
