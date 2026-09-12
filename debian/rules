@@ -3,7 +3,7 @@
 	dh $@
 
 override_dh_auto_install:
-	install -D -m 0755 shellwatch "$$(pwd)/debian/shellwatch/usr/bin/shellwatch"
+	install -D -m 0755 bin/shellwatch "$$(pwd)/debian/shellwatch/usr/bin/shellwatch"
 	mkdir -p "$$(pwd)/debian/shellwatch/usr/share/shellwatch"
 	install -m 0755 helper.sh "$$(pwd)/debian/shellwatch/usr/share/shellwatch/helper.sh"
 	install -D -m 0755 Shellwatch.desktop $$(pwd)/debian/shellwatch/usr/share/applications/Shellwatch.desktop
