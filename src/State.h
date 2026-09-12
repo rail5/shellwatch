@@ -42,6 +42,7 @@ class State {
 		std::uint32_t getCurrentLineNumber() const { return currentLineNumber; }
 		Milliseconds getAutostepInterval() const { return autostepInterval; }
 		bool isAutostepEnabled() const { return autostepEnabled; }
+		bool isExecutionFinished() const { return executionFinished; }
 
 		void setAutostepInterval(Milliseconds interval) { autostepInterval = interval; }
 		void setAutostepEnabled(bool enabled) { autostepEnabled = enabled; }

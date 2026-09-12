@@ -12,6 +12,7 @@
 #include <wx/richtext/richtextctrl.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/timer.h>
 
 #include <cstdint>
 #include <expected>
@@ -61,20 +62,23 @@ class MainWindow : public wxFrame {
 
 		void OnOpen(wxCommandEvent& event);
 		void OnAutostepTextChanged(wxCommandEvent& event);
+		void OnAutostepCheckboxChanged(wxCommandEvent& event);
+		void OnAutostepTimer(wxTimerEvent& event);
 		void OnStep(wxCommandEvent& event);
 		void OnTerminate(wxCommandEvent& event);
 
 		void OnQuit(wxCommandEvent& /*event*/);
 		void OnAbout(wxCommandEvent& /*event*/);
 
-		const wxWindowID ID_BUTTON1       = wxNewId();
-		const wxWindowID ID_STATICTEXT1   = wxNewId();
-		const wxWindowID ID_BUTTON2       = wxNewId();
-		const wxWindowID ID_CHECKBOX1     = wxNewId();
-		const wxWindowID ID_RICHTEXTCTRL1 = wxNewId();
-		const wxWindowID ID_LISTCTRL1     = wxNewId();
-		const wxWindowID ID_RICHTEXTCTRL2 = wxNewId();
-		const wxWindowID ID_MENU_QUIT     = wxNewId();
+		const wxWindowID ID_BUTTON1        = wxNewId();
+		const wxWindowID ID_STATICTEXT1    = wxNewId();
+		const wxWindowID ID_BUTTON2        = wxNewId();
+		const wxWindowID ID_CHECKBOX1      = wxNewId();
+		const wxWindowID ID_RICHTEXTCTRL1  = wxNewId();
+		const wxWindowID ID_LISTCTRL1      = wxNewId();
+		const wxWindowID ID_RICHTEXTCTRL2  = wxNewId();
+		const wxWindowID ID_MENU_QUIT      = wxNewId();
+		const wxWindowID ID_TIMER_AUTOSTEP = wxNewId();
 
 		wxMenuBar* menuBar;
 		wxMenu* fileMenu;
@@ -84,6 +88,8 @@ class MainWindow : public wxFrame {
 		wxCheckBox* AutostepCheckbox;
 		wxListCtrl* ShellVariableListCtrl;
 		wxTextCtrl* AutostepTextCtrl;
+		wxTimer AutoStepTimer;
+		bool AutoStepTickInProgress = false;
 		wxRichTextCtrl* SourceCodeDisplay;
 		wxStaticText* LineNumberLabel;
 		wxBoxSizer* BottomSizer;

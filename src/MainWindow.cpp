@@ -65,6 +65,7 @@ MainWindow::MainWindow(wxWindow* parent,wxWindowID id) {
 	AutostepContainer = new wxBoxSizer(wxVERTICAL);
 	AutostepCheckbox = new wxCheckBox(this, ID_CHECKBOX1, _("Auto-step"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	AutostepCheckbox->SetValue(false);
+	AutostepCheckbox->Bind(wxEVT_CHECKBOX, &MainWindow::OnAutostepCheckboxChanged, this);
 	AutostepTextCtrl = new wxTextCtrl(this, ID_RICHTEXTCTRL1, _T("0.1"), wxDefaultPosition, wxSize(85,32), 0, wxDefaultValidator, _T("ID_RICHTEXTCTRL1"));
 	AutostepTextCtrl->Bind(wxEVT_TEXT, &MainWindow::OnAutostepTextChanged, this);
 	AutostepContainer->Add(AutostepCheckbox, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 1);
@@ -93,6 +94,8 @@ MainWindow::MainWindow(wxWindow* parent,wxWindowID id) {
 	MainWindowContainer->Add(BottomSizer, 1, wxALL|wxEXPAND, 5);
 
 	SetSizerAndFit(MainWindowContainer);
+	AutoStepTimer.SetOwner(this, ID_TIMER_AUTOSTEP);
+	Bind(wxEVT_TIMER, &MainWindow::OnAutostepTimer, this, ID_TIMER_AUTOSTEP);
 	Centre();
 }
 
@@ -177,10 +180,46 @@ void MainWindow::OnAutostepTextChanged(wxCommandEvent& event) {
 		state.setAutostepInterval(*parsedInterval);
 		AutostepTextCtrl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW)); // Reset to default background color
 		AutostepTextCtrl->Refresh(); // Refresh to apply the color change
+		if (state.isAutostepEnabled()) {
+			AutoStepTimer.Stop();
+			AutoStepTimer.Start(static_cast<int>(state.getAutostepInterval()));
+		}
 	} else {
 		// Highlight the text box in red to indicate an error
 		AutostepTextCtrl->SetBackgroundColour(wxColour(255, 0, 0)); // Red background
 		AutostepTextCtrl->Refresh(); // Refresh to apply the color change
+		state.setAutostepEnabled(false);
+		AutostepCheckbox->SetValue(false);
+		AutoStepTimer.Stop();
+	}
+}
+
+void MainWindow::OnAutostepCheckboxChanged(wxCommandEvent& event) {
+	state.setAutostepEnabled(event.IsChecked());
+	if (event.IsChecked()) {
+		AutoStepTimer.Start(static_cast<int>(state.getAutostepInterval()));
+	} else {
+		AutoStepTimer.Stop();
+	}
+}
+
+void MainWindow::OnAutostepTimer(wxTimerEvent& /*event*/) {
+	if (!state.isAutostepEnabled()) {
+		AutoStepTimer.Stop();
+		return;
+	}
+	if (AutoStepTickInProgress) {
+		return;
+	}
+
+	AutoStepTickInProgress = true;
+	(*this|state).stepScript();
+	AutoStepTickInProgress = false;
+
+	if (state.isExecutionFinished()) {
+		state.setAutostepEnabled(false);
+		AutostepCheckbox->SetValue(false);
+		AutoStepTimer.Stop();
 	}
 }
 
@@ -196,10 +235,16 @@ void MainWindow::OnStep(wxCommandEvent& /*event*/) {
 }
 
 void MainWindow::OnTerminate(wxCommandEvent& /*event*/) {
+	AutoStepTimer.Stop();
+	state.setAutostepEnabled(false);
+	AutostepCheckbox->SetValue(false);
 	(*this|state).killScript();
 }
 
 void MainWindow::OnQuit(wxCommandEvent& /*event*/) { // NOLINT(readability-convert-member-functions-to-static) (wxWidgets requires this to be a member function)
+	AutoStepTimer.Stop();
+	state.setAutostepEnabled(false);
+	AutostepCheckbox->SetValue(false);
 	if (wxAppConsole* app = wxApp::GetInstance()) {
 		app->ExitMainLoop();
 	}
