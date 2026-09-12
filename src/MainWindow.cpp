@@ -230,6 +230,7 @@ void MainWindow::OnAutostepTimer(wxTimerEvent& /*event*/) {
 void MainWindow::OnOpen(wxCommandEvent& /*event*/) {
 	wxFileDialog dialog(this, _("Open script"), wxEmptyString, wxEmptyString, _("All files (*.*)|*.*"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
 	if (dialog.ShowModal() == wxID_OK) {
+		(*this|state).killScript(); // Ensure any running script is terminated before opening a new one
 		(*this|state).setScriptFile(std::filesystem::path(dialog.GetPath().ToStdString()));
 	}
 }
