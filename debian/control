@@ -2,7 +2,7 @@ Source: shellwatch
 Homepage: https://github.com/rail5/shellwatch
 Priority: optional
 Maintainer: rail5 <andrew@rail5.org>
-Build-Depends: debhelper (>= 8.0.0), wx3.2-headers, libwxgtk3.2-dev
+Build-Depends: debhelper (>= 10.0.0), wx3.2-headers, libwxgtk3.2-dev
 Standards-Version: 4.7.0
 Section: utils
 
