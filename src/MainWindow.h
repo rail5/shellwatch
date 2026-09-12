@@ -15,6 +15,7 @@
 
 #include <cstdint>
 #include <expected>
+#include <filesystem>
 
 using Milliseconds = std::uint64_t;
 
@@ -29,6 +30,8 @@ class MainWindow : public wxFrame {
 		MainWindow& operator=(MainWindow&&) = delete;
 
 	private:
+		std::filesystem::path script;
+
 		std::uint32_t currentLineNumber = 0;
 
 		Milliseconds autostepInterval = 100;
@@ -50,8 +53,32 @@ class MainWindow : public wxFrame {
 		 */
 		static std::string displayAsSeconds(Milliseconds ms);
 
+		/**
+		 * @brief Highlight a specific line in the source code display based on the provided line number. The line number is 1-based.
+		 *
+		 * If called as highlightSourceCodeLine(0), it will clear any existing highlights without highlighting any line.
+		 * 
+		 * @param lineNumber The line number to highlight in the source code display (1-based).
+		 */
 		void highlightSourceCodeLine(std::uint32_t lineNumber);
+
+		/**
+		 * @brief Update both the currentLineNumber internal value and the displayed line number in the GUI.
+		 * 
+		 * @param lineNumber The new line number to set and display.
+		 */
+		void updateLineNumber(std::uint32_t lineNumber);
+
+		/**
+		 * @brief Update the internal script file path, set the line number to 0, and update the displayed source code to the contents of the new script file.
+		 * 
+		 * @param filePath The path to the new script file to be set.
+		 */
+		void setScriptFile(const std::filesystem::path& filePath);
+
+		void OnOpen(wxCommandEvent& event);
 		void OnAutostepTextChanged(wxCommandEvent& event);
+		void OnStep(wxCommandEvent& event);
 
 		void OnQuit(wxCommandEvent& /*event*/);
 		void OnAbout(wxCommandEvent& /*event*/);

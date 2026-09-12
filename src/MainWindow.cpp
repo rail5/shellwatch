@@ -5,17 +5,23 @@
 
 #include "MainWindow.h"
 
+#include <wx/app.h>
+#include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 #include <wx/intl.h>
 #include <wx/menu.h>
 #include <wx/settings.h>
 #include <wx/string.h>
 
+#include <fstream>
+#include <sstream>
+
 // Unfortunately, wxWidgets relies on raw 'new' and 'delete'.
 // NOLINTBEGIN(cppcoreguidelines-owning-memory)
 // NOLINTBEGIN(cppcoreguidelines-prefer-member-initializer)
 
 BEGIN_EVENT_TABLE(MainWindow,wxFrame) // NOLINT (no point linting the expansion of a macro we can't control)
+EVT_MENU(wxID_OPEN, MainWindow::OnOpen)
 EVT_MENU(wxID_EXIT, MainWindow::OnQuit)
 EVT_MENU(wxID_ABOUT, MainWindow::OnAbout)
 END_EVENT_TABLE()
@@ -50,6 +56,7 @@ MainWindow::MainWindow(wxWindow* parent,wxWindowID id) {
 	StepButtonContainer = new wxBoxSizer(wxVERTICAL);
 	LineNumberLabel = new wxStaticText(this, ID_STATICTEXT1, _("Line: 0"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	StepButton = new wxButton(this, ID_BUTTON2, _("Step"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	StepButton->Bind(wxEVT_BUTTON, &MainWindow::OnStep, this);
 	StepButtonContainer->Add(LineNumberLabel, 0, wxTOP|wxLEFT|wxRIGHT|wxALIGN_CENTER_HORIZONTAL, 1);
 	StepButtonContainer->Add(StepButton, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, 1);
 
@@ -140,6 +147,8 @@ void MainWindow::highlightSourceCodeLine(std::uint32_t lineNumber) {
 	// Clear any existing highlights
 	SourceCodeDisplay->SetStyle(wxRichTextRange(0, SourceCodeDisplay->GetLastPosition()), wxTextAttr(wxNullColour, wxNullColour));
 
+	if (lineNumber == 0) return; // No line to highlight
+
 	// Calculate the start and end positions of the specified line
 	auto lineStartPos = SourceCodeDisplay->XYToPosition(0, lineNumber - 1);
 	auto lineEndPos = SourceCodeDisplay->XYToPosition(SourceCodeDisplay->GetLineLength(lineNumber - 1), lineNumber - 1);
@@ -148,6 +157,36 @@ void MainWindow::highlightSourceCodeLine(std::uint32_t lineNumber) {
 	// Highlight the specified line
 	SourceCodeDisplay->SetStyle(lineRange, wxTextAttr(wxColour(0, 0, 0), wxColour(255, 255, 0))); // Yellow background, black text
 	SourceCodeDisplay->ShowPosition(lineStartPos); // Ensure the highlighted line is visible
+}
+
+void MainWindow::updateLineNumber(std::uint32_t lineNumber) {
+	currentLineNumber = lineNumber;
+	LineNumberLabel->SetLabelText(wxString::Format(_("Line: %u"), currentLineNumber));
+	highlightSourceCodeLine(currentLineNumber);
+}
+
+void MainWindow::setScriptFile(const std::filesystem::path& filePath) {
+	if (!std::filesystem::exists(filePath)) {
+		SourceCodeDisplay->SetValue(_("Error: Script file does not exist."));
+		return;
+	}
+
+	script = filePath;
+	updateLineNumber(0);
+	highlightSourceCodeLine(0); // Clear any existing highlights
+
+	// Load the script file content into the SourceCodeDisplay
+	std::ifstream scriptFile(script);
+	if (!scriptFile) {
+		SourceCodeDisplay->SetValue(_("Error: Unable to open script file."));
+		return;
+	}
+
+	std::stringstream contents;
+	contents << scriptFile.rdbuf();
+	
+	SourceCodeDisplay->SetValue(contents.str());
+	scriptFile.close();
 }
 
 void MainWindow::OnAutostepTextChanged(wxCommandEvent& event) {
@@ -161,6 +200,17 @@ void MainWindow::OnAutostepTextChanged(wxCommandEvent& event) {
 		AutostepTextCtrl->SetBackgroundColour(wxColour(255, 0, 0)); // Red background
 		AutostepTextCtrl->Refresh(); // Refresh to apply the color change
 	}
+}
+
+void MainWindow::OnOpen(wxCommandEvent& /*event*/) {
+	wxFileDialog dialog(this, _("Open script"), wxEmptyString, wxEmptyString, _("All files (*.*)|*.*"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+	if (dialog.ShowModal() == wxID_OK) {
+		setScriptFile(std::filesystem::path(dialog.GetPath().ToStdString()));
+	}
+}
+
+void MainWindow::OnStep(wxCommandEvent& /*event*/) {
+	// fixme
 }
 
 void MainWindow::OnQuit(wxCommandEvent& /*event*/) {
