@@ -24,7 +24,7 @@ EVT_MENU(wxID_OPEN, MainWindow::OnOpen)
 EVT_MENU(wxID_ABOUT, MainWindow::OnAbout)
 END_EVENT_TABLE()
 
-MainWindow::MainWindow(wxWindow* parent,wxWindowID id) {
+MainWindow::MainWindow(wxWindow* parent, int argc, const wxCmdLineArgsArray& argv, wxWindowID id) {
 	Create(parent, id, _("Shellwatch"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("id"));
 
 	menuBar = new wxMenuBar();
@@ -97,6 +97,10 @@ MainWindow::MainWindow(wxWindow* parent,wxWindowID id) {
 	AutoStepTimer.SetOwner(this, ID_TIMER_AUTOSTEP);
 	Bind(wxEVT_TIMER, &MainWindow::OnAutostepTimer, this, ID_TIMER_AUTOSTEP);
 	Centre();
+
+	if (argc > 1) {
+		(*this|state).setScriptFile(std::filesystem::path(argv[1].ToStdString()));
+	}
 }
 
 MainWindow::~MainWindow() {}

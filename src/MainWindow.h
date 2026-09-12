@@ -13,15 +13,17 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/timer.h>
+#include <wx/cmdargs.h>
 
 #include <cstdint>
 #include <expected>
 
 #include "State.h"
 
+
 class MainWindow : public wxFrame {
 	public:
-		explicit MainWindow(wxWindow* parent, wxWindowID id = -1);
+		explicit MainWindow(wxWindow* parent, int argc, const wxCmdLineArgsArray& argv, wxWindowID id = -1);
 		virtual ~MainWindow();
 
 		MainWindow(const MainWindow&) = delete;

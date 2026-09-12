@@ -12,7 +12,7 @@ IMPLEMENT_APP(App); // NOLINT (no point linting the expansion of a macro we can'
 
 bool App::OnInit() {
 	wxInitAllImageHandlers();
-	auto* dlg = new MainWindow(nullptr); // NOLINT(cppcoreguidelines-owning-memory) (wxWidgets relies on raw 'new' and 'delete')
+	auto* dlg = new MainWindow(nullptr, argc, argv); // NOLINT(cppcoreguidelines-owning-memory) (wxWidgets relies on raw 'new' and 'delete')
 	SetTopWindow(dlg);
 	dlg->Show(true);
 	return true;
