@@ -89,6 +89,20 @@ MainWindow::MainWindow(wxWindow* parent,wxWindowID id) {
 
 MainWindow::~MainWindow() {}
 
+void MainWindow::highlightSourceCodeLine(std::uint32_t lineNumber) {
+	// Clear any existing highlights
+	SourceCodeDisplay->SetStyle(wxRichTextRange(0, SourceCodeDisplay->GetLastPosition()), wxTextAttr(wxNullColour, wxNullColour));
+
+	// Calculate the start and end positions of the specified line
+	auto lineStartPos = SourceCodeDisplay->XYToPosition(0, lineNumber - 1);
+	auto lineEndPos = SourceCodeDisplay->XYToPosition(SourceCodeDisplay->GetLineLength(lineNumber - 1), lineNumber - 1);
+	wxRichTextRange lineRange(lineStartPos, lineEndPos);
+
+	// Highlight the specified line
+	SourceCodeDisplay->SetStyle(lineRange, wxTextAttr(wxColour(0, 0, 0), wxColour(255, 255, 0))); // Yellow background, black text
+	SourceCodeDisplay->ShowPosition(lineStartPos); // Ensure the highlighted line is visible
+}
+
 void MainWindow::OnQuit(wxCommandEvent& /*event*/) {
 	Close();
 }

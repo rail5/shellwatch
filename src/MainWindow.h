@@ -13,6 +13,8 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 
+#include <cstdint>
+
 class MainWindow : public wxFrame {
 	public:
 		explicit MainWindow(wxWindow* parent, wxWindowID id = -1);
@@ -24,6 +26,8 @@ class MainWindow : public wxFrame {
 		MainWindow& operator=(MainWindow&&) = delete;
 
 	private:
+		void highlightSourceCodeLine(std::uint32_t lineNumber);
+
 		void OnQuit(wxCommandEvent& /*event*/);
 		void OnAbout(wxCommandEvent& /*event*/);
 
